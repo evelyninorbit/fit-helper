@@ -23,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='zh-Hant-TW' className={roboto.variable}>
-      <body>
+      <body style={{backgroundColor:"#fae6cd", minHeight:'100vh'}}>
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>{children}</ThemeProvider>
         </AppRouterCacheProvider>

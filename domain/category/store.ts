@@ -56,7 +56,6 @@ const defaultCategories: Category[] = []
 
 const initialCategoriesState: CategoryStore = {
   categories: defaultCategories,
-  isLoading: false,
 }
 
 export const useCategoriesStore = create<CategoryStore>()(

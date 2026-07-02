@@ -1,6 +1,6 @@
 import theme from '@/style/theme'
 import { Roboto } from 'next/font/google'
-import { ThemeProvider } from '@mui/material'
+import { CssBaseline, ThemeProvider } from '@mui/material'
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v16-appRouter'
 import type { Metadata } from 'next'
 
@@ -23,9 +23,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='zh-Hant-TW' className={roboto.variable}>
-      <body style={{backgroundColor:"#fae6cd", minHeight:'100vh'}}>
+      <body style={{ backgroundColor: '#fae6cd', minHeight: '100vh' }}>
         <AppRouterCacheProvider>
-          <ThemeProvider theme={theme}>{children}</ThemeProvider>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            {children}
+          </ThemeProvider>
         </AppRouterCacheProvider>
       </body>
     </html>

@@ -20,12 +20,6 @@ export type SetRecordWithoutLoad = SetBasicRecord
 
 export type SetRecord = SetRecordWithLoad | SetRecordWithoutLoad
 
-// deprecated
-export type RestRecord = {
-  id: string
-  startedAt: string
-  finishedAt: string
-}
 
 export type ExerciseBasicRecord = {
   id: string

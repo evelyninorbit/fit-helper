@@ -1,4 +1,5 @@
 import type { Exercise } from "./schema";
+import { EExerciseType, ELoadUnit } from "./schema";
 import { useMemo } from "react";
 import { create } from 'zustand'
 import { persist } from "zustand/middleware";
@@ -8,89 +9,115 @@ import { immer } from "zustand/middleware/immer";
 const ALL = '' as const
 
 export const EXERCISES: Exercise[] = [
-    {id: 1,
+    {
+        id: 1,
         name: '啞鈴胸推',
-        unitType: 'weight',
         bodyPart: '胸',
         equipment: '啞鈴',
         display: true,
-        restTime: '90'},
-    {id: 2,
+        restTime: '90',
+        type: EExerciseType.WEIGHT,
+        withLoad: true,
+        loadUnit: ELoadUnit.KG,
+    },
+    {
+        id: 2,
         name: '啞鈴肩推',
-        unitType: 'weight',
         bodyPart: '肩',
         equipment: '啞鈴',
         display: true,
-        restTime: '90'},
-    {id: 3,
+        restTime: '90',
+        type: EExerciseType.WEIGHT,
+        withLoad: true,
+        loadUnit: ELoadUnit.KG,
+    },
+    {
+        id: 3,
         name: '槓鈴胸推',
-        unitType: 'weight',
         bodyPart: '胸',
         equipment: '槓鈴',
         display: true,
-        restTime: '90'},
+        restTime: '90',
+        type: EExerciseType.WEIGHT,
+        withLoad: true,
+        loadUnit: ELoadUnit.KG,
+    },
     {
         id: 4,
         name: "滑輪下拉",
-        unitType: "weight",
         bodyPart: "背",
         equipment: "cable機",
         display: true,
-        restTime: '90'
+        restTime: '90',
+        type: EExerciseType.WEIGHT,
+        withLoad: true,
+        loadUnit: ELoadUnit.KG,
     },
     {
         id: 5,
         name: "直臂下壓",
-        unitType: "weight",
         bodyPart: "背",
         equipment: "cable機",
         display: true,
-        restTime: '90'
+        restTime: '90',
+        type: EExerciseType.WEIGHT,
+        withLoad: true,
+        loadUnit: ELoadUnit.KG,
     },
     {
         id: 6,
         name: "腿部外展",
-        unitType: "weight",
         bodyPart: "腿",
         equipment: "器械式",
         display: true,
-        restTime: '90'
+        restTime: '90',
+        type: EExerciseType.WEIGHT,
+        withLoad: true,
+        loadUnit: ELoadUnit.KG,
     },
     {
         id: 7,
         name: "腿部內收",
-        unitType: "weight",
         bodyPart: "腿",
         equipment: "器械式",
         display: true,
-        restTime: '90'
+        restTime: '90',
+        type: EExerciseType.WEIGHT,
+        withLoad: true,
+        loadUnit: ELoadUnit.KG,
     },
     {
         id: 8,
         name: "臀推",
-        unitType: "weight",
         bodyPart: "腿",
         equipment: "器械式",
         display: true,
-        restTime: '90'
+        restTime: '90',
+        type: EExerciseType.WEIGHT,
+        withLoad: true,
+        loadUnit: ELoadUnit.KG,
     },
     {
         id: 9,
         name: "腿推",
-        unitType: "weight",
         bodyPart: "腿",
         equipment: "器械式",
         display: true,
-        restTime: '90'
+        restTime: '90',
+        type: EExerciseType.WEIGHT,
+        withLoad: true,
+        loadUnit: ELoadUnit.KG,
     },
     {
         id: 10,
         name: "滑輪三頭下壓",
-        unitType: "weight",
         bodyPart: "手臂",
         equipment: "cable機",
         display: false,
-        restTime:'90'
+        restTime: '90',
+        type: EExerciseType.WEIGHT,
+        withLoad: true,
+        loadUnit: ELoadUnit.KG,
     }
 ]
 

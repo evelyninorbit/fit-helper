@@ -1,5 +1,5 @@
 import { persist } from 'zustand/middleware'
-import { Record } from './schema'
+import { Record, ExerciseRecord, SetRecord } from './schema'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 
@@ -39,41 +39,21 @@ export const updateRecord = (
 
 export const updateSetInRecords = (
   recordId: Record['id'],
-  setId: Record['sets'][number]['id'],
-  updatedSet: Partial<Record['sets'][number]>,
+  exerciseId: ExerciseRecord['id'],
+  setId: SetRecord['id'],
+  updatedSet: Partial<SetRecord>,
 ) => {
   useRecordsStore.setState(state => {
-    const recordIndex = state.records.findIndex(r => r.id === recordId)
-    if (recordIndex === -1) return
+    const record = state.records.find(r => r.id === recordId)
+    if (!record) return
 
-    const record = state.records[recordIndex]
-    const setIndex = record.sets.findIndex(s => s.id === setId)
-    if (setIndex === -1) return
+    const exercise = record.exercise.find(e => e.id === exerciseId)
+    if (!exercise) return
 
-    state.records[recordIndex].sets[setIndex] = {
-      ...record.sets[setIndex],
-      ...updatedSet,
-    }
-  })
-}
+    const set = (exercise.sets as SetRecord[]).find(s => s.id === setId)
+    if (!set) return
 
-export const updateRestInRecords = (
-  recordId: Record['id'],
-  restId: Record['rests'][number]['id'],
-  updatedRest: Partial<Record['rests'][number]>,
-) => {
-  useRecordsStore.setState(state => {
-    const recordIndex = state.records.findIndex(r => r.id === recordId)
-    if (recordIndex === -1) return
-
-    const record = state.records[recordIndex]
-    const restIndex = record.rests.findIndex(r => r.id === restId)
-    if (restIndex === -1) return
-
-    state.records[recordIndex].rests[restIndex] = {
-      ...record.rests[restIndex],
-      ...updatedRest,
-    }
+    Object.assign(set, updatedSet)
   })
 }
 

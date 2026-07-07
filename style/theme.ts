@@ -13,6 +13,12 @@ const theme = createTheme({
       dark: '#a12533',
       contrastText: '#fff',
     },
+    secondary:{
+      main:'#fae6cd'
+    },
+    background: {
+      default: '#fae6cd',
+    },
   },
 })
 

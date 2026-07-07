@@ -94,7 +94,7 @@ export default function SelectExercise() {
         </FormControl>
       </Container>
 
-      <List sx={{ width: '50%' }}>
+      <List sx={{  width: { xs: "80%", sm: "50%" }, }}>
         {filtered.map(e => (
           <ListItem
             key={e.id}
@@ -110,6 +110,7 @@ export default function SelectExercise() {
           </ListItem>
         ))}
       </List>
+    
     </Stack>
   )
 }

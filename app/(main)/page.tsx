@@ -2,34 +2,31 @@
 
 import { Container, Avatar, Button, Stack } from '@mui/material'
 import DirectionsRunRoundedIcon from '@mui/icons-material/DirectionsRunRounded'
-import DoneAllRoundedIcon from '@mui/icons-material/DoneAllRounded'
+import DirectionsWalkRoundedIcon from '@mui/icons-material/DirectionsWalkRounded';
 import SettingsIcon from '@mui/icons-material/Settings'
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks'
 import NextLink from '@/components/NextLink'
 import useWorkoutStore, {
-  resetWorkout,
+
   startWorkout,
 } from '@/domain/workout/store'
-import { addRecord } from '@/domain/record/store'
-import { useId } from 'react'
+
+import { useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 
 const RootPage: React.FC = () => {
-  const uid = useId()
   const workout = useWorkoutStore(state => state)
+  const router = useRouter()
+  const [isNavigating, startNavigation] = useTransition()
 
   const handleStartWorkout = () => {
-    startWorkout()
-  }
-
-  const handleCompleteWorkout = () => {
-    if (!workout?.startedAt) return
-    addRecord({
-      ...workout,
-      id: uid,
-      finishedAt: new Date().toISOString(),
+    startNavigation(() => {
+      startWorkout()
+      router.replace('/workoutinprogress')
     })
-    resetWorkout()
   }
+    
+
 
   return (
     <Container
@@ -52,19 +49,14 @@ const RootPage: React.FC = () => {
             width: 200,
           }}
         >
-          {workout === null
-            ? '(載入中)'
-            : workout.startedAt
-              ? '(進行中)'
-              : '(尚未開始)'}
-          {workout === null ? (
+          {workout === null || isNavigating ? (
             <Button
               fullWidth
               variant='contained'
               color='primary'
-              sx={{ height: 64, px: 4, justifyContent: 'space-between' }}
-              onClick={handleCompleteWorkout}
-              loading={true}
+              sx={{ height: 64, px: 4, justifyContent: 'space-between'}}
+              loading
+              loadingPosition='start'
             >
               載入中
             </Button>
@@ -74,10 +66,11 @@ const RootPage: React.FC = () => {
               variant='contained'
               color='primary'
               sx={{ height: 64, px: 4, justifyContent: 'space-between' }}
-              onClick={handleCompleteWorkout}
-              startIcon={<DoneAllRoundedIcon />}
+              LinkComponent={NextLink}
+              href='./workoutinprogress'
+              startIcon={<DirectionsRunRoundedIcon />}
             >
-              完成運動
+              繼續運動
             </Button>
           ) : (
             <Button
@@ -86,7 +79,7 @@ const RootPage: React.FC = () => {
               color='primary'
               sx={{ height: 64, px: 4, justifyContent: 'space-between' }}
               onClick={handleStartWorkout}
-              startIcon={<DirectionsRunRoundedIcon />}
+              startIcon={<DirectionsWalkRoundedIcon/>}
             >
               開始運動
             </Button>

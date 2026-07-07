@@ -14,11 +14,13 @@ const defaultWorkout: Workout = {
 const useWorkoutStore = create<WorkoutStore>()(
   persist<WorkoutStore>(() => null, {
     name: 'workout',
-    onRehydrateStorage: () => (state, error) => {
-      if (state === null) return defaultWorkout
-      if (error) console.error('Failed to rehydrate categories store', error)
+    merge: (persistedState) =>
+      (persistedState as WorkoutStore) ?? defaultWorkout,
+    onRehydrateStorage: () => (_state, error) => {
+      if (error) console.error('Failed to rehydrate workout store', error)
     },
-  }),
+  })
+  
 )
 
 export default useWorkoutStore

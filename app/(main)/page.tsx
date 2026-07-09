@@ -1,44 +1,60 @@
 'use client'
 
 import { Container, Avatar, Button, Stack } from '@mui/material'
-import DirectionsRunRoundedIcon from '@mui/icons-material/DirectionsRunRounded'
-import DirectionsWalkRoundedIcon from '@mui/icons-material/DirectionsWalkRounded';
+import DirectionsWalkRoundedIcon from '@mui/icons-material/DirectionsWalkRounded'
 import SettingsIcon from '@mui/icons-material/Settings'
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks'
 import NextLink from '@/components/NextLink'
-import useWorkoutStore, {
+import useWorkoutStore, { startWorkout } from '@/domain/workout/store'
+import Settings from '@/components/Settings'
+import WorkoutBottomNavigation from '@/components/WorkoutBottomNavigation'
+import { AddExercise, ExerciseList } from '@/components/SelectingExercise'
 
-  startWorkout,
-} from '@/domain/workout/store'
-
-import { useTransition } from 'react'
-import { useRouter } from 'next/navigation'
-
-const RootPage: React.FC = () => {
-  const workout = useWorkoutStore(state => state)
-  const router = useRouter()
-  const [isNavigating, startNavigation] = useTransition()
-
-  const handleStartWorkout = () => {
-    startNavigation(() => {
-      startWorkout()
-      router.replace('/workoutinprogress')
-    })
-  }
-    
-
-
-  return (
+const RootWithWorkout: React.FC = () => (
+  <>
     <Container
+      maxWidth='xs'
       sx={{
-        minHeight: '100dvh',
+        pt: 2,
+        flexGrow: 1,
+        flexShrink: 1,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
+        overflowY: 'auto',
+        mb: 2,
       }}
     >
-      <Stack direction='column' spacing={10} sx={{ alignItems: 'center' }}>
+      <AddExercise />
+      <ExerciseList />
+    </Container>
+
+    <WorkoutBottomNavigation />
+  </>
+)
+
+const RootWithoutWorkout: React.FC = () => {
+  const handleStartWorkout = () => {
+    startWorkout()
+  }
+
+  return (
+    <Container
+      maxWidth='sm'
+      sx={{
+        height: 'stretch',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Stack
+        direction='column'
+        spacing={10}
+        sx={{
+          alignItems: 'center',
+        }}
+      >
         <Avatar sx={{ bgcolor: 'primary.main', width: 80, height: 80 }} />
 
         <Stack
@@ -49,52 +65,29 @@ const RootPage: React.FC = () => {
             width: 200,
           }}
         >
-          {workout === null || isNavigating ? (
-            <Button
-              fullWidth
-              variant='contained'
-              color='primary'
-              sx={{ height: 64, px: 4, justifyContent: 'space-between'}}
-              loading
-              loadingPosition='start'
-            >
-              載入中
-            </Button>
-          ) : workout.startedAt ? (
-            <Button
-              fullWidth
-              variant='contained'
-              color='primary'
-              sx={{ height: 64, px: 4, justifyContent: 'space-between' }}
-              LinkComponent={NextLink}
-              href='./workoutinprogress'
-              startIcon={<DirectionsRunRoundedIcon />}
-            >
-              繼續運動
-            </Button>
-          ) : (
-            <Button
-              fullWidth
-              variant='contained'
-              color='primary'
-              sx={{ height: 64, px: 4, justifyContent: 'space-between' }}
-              onClick={handleStartWorkout}
-              startIcon={<DirectionsWalkRoundedIcon/>}
-            >
-              開始運動
-            </Button>
-          )}
           <Button
-            LinkComponent={NextLink}
-            href='/settings'
             fullWidth
             variant='contained'
             color='primary'
             sx={{ height: 64, px: 4, justifyContent: 'space-between' }}
-            startIcon={<SettingsIcon />}
+            onClick={handleStartWorkout}
+            startIcon={<DirectionsWalkRoundedIcon />}
           >
-            設定動作
+            開始運動
           </Button>
+          <Settings slotProps={{ trigger: { sx: { width: '100%' } } }}>
+            <Button
+              // LinkComponent={NextLink}
+              // href='/settings'
+              fullWidth
+              variant='contained'
+              color='primary'
+              sx={{ height: 64, px: 4, justifyContent: 'space-between' }}
+              startIcon={<SettingsIcon />}
+            >
+              設定動作
+            </Button>
+          </Settings>
           <Button
             LinkComponent={NextLink}
             href='/records'
@@ -109,6 +102,20 @@ const RootPage: React.FC = () => {
         </Stack>
       </Stack>
     </Container>
+  )
+}
+
+const RootPage: React.FC = () => {
+  const workout = useWorkoutStore(state => state)
+
+  return workout === null ? (
+    <>載入畫面</>
+  ) : workout.finishedAt ? (
+    <>結束畫面</>
+  ) : workout.startedAt ? (
+    <RootWithWorkout />
+  ) : (
+    <RootWithoutWorkout />
   )
 }
 

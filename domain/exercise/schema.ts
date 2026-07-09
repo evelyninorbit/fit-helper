@@ -4,7 +4,7 @@ export type ExerciseBasic = {
   bodyPart: string
   equipment: string
   display: boolean
-  restTime: string
+  restTime: number
 }
 
 export enum EExerciseType {

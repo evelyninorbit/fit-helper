@@ -14,13 +14,11 @@ const defaultWorkout: Workout = {
 const useWorkoutStore = create<WorkoutStore>()(
   persist<WorkoutStore>(() => null, {
     name: 'workout',
-    merge: (persistedState) =>
-      (persistedState as WorkoutStore) ?? defaultWorkout,
+    merge: persistedState => (persistedState as WorkoutStore) ?? defaultWorkout,
     onRehydrateStorage: () => (_state, error) => {
       if (error) console.error('Failed to rehydrate workout store', error)
     },
-  })
-  
+  }),
 )
 
 export default useWorkoutStore
@@ -32,14 +30,14 @@ const startWorkout = () => {
   })
 }
 
-// const finishWorkout = () => {
-//   useWorkoutStore.setState(prev => {
-//     if (!prev?.startedAt) return prev
-//     return {
-//       finishedAt: new Date().toISOString(),
-//     }
-//   })
-// }
+const finishWorkout = () => {
+  useWorkoutStore.setState(prev => {
+    if (!prev?.startedAt) return prev
+    return {
+      finishedAt: new Date().toISOString(),
+    }
+  })
+}
 
 const resetWorkout = () => {
   useWorkoutStore.setState(defaultWorkout)
@@ -92,6 +90,7 @@ const removeExerciseFromWorkout = (exerciseId: string) => {
 
 export {
   startWorkout,
+  finishWorkout,
   resetWorkout,
   updateWorkoutNote,
   addExerciseToWorkout,

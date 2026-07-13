@@ -25,6 +25,7 @@ const WorkoutBottomNavigation: React.FC = () => {
     <BottomNavigation
       showLabels
       sx={{
+        width:'100%',
         bgcolor: 'primary.main',
         [`.${bottomNavigationActionClasses.root}`]: {
           color: 'primary.contrastText',

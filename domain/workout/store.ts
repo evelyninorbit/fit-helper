@@ -2,13 +2,14 @@ import { create } from 'zustand'
 import type { Workout } from './schema'
 import { persist } from 'zustand/middleware'
 
+
 export type WorkoutStore = Workout | null
 
 const defaultWorkout: Workout = {
   startedAt: '',
   finishedAt: '',
   note: '',
-  exercise: [],
+  exercise:[],
 }
 
 const useWorkoutStore = create<WorkoutStore>()(
@@ -41,6 +42,15 @@ const finishWorkout = () => {
 
 const resetWorkout = () => {
   useWorkoutStore.setState(defaultWorkout)
+}
+
+const resumeWorkout = () => {
+  useWorkoutStore.setState(prev => {
+    if (!prev?.startedAt) return prev
+    return {
+      finishedAt: '',
+    }
+  })
 }
 
 const updateWorkoutNote = (note: string) => {
@@ -92,6 +102,7 @@ export {
   startWorkout,
   finishWorkout,
   resetWorkout,
+  resumeWorkout,
   updateWorkoutNote,
   addExerciseToWorkout,
   updateExerciseInWorkout,

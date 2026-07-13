@@ -1,14 +1,14 @@
 "use client";
 import * as React from "react";
+import { useState } from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-import SelectExercise from "./SelectExercise";
-import SetTimeInterval from "./SetTimeInterval";
 import { Container } from "@mui/material";
-import { IconButton } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useRouter } from "next/navigation";
+import SettingDefaultRestTime from "./SettingDefaultRestTime";
+import ExerciseFilter from "./ExerciseFilter";
+import { useExerciseStore } from "@/domain/exercise/store";
+import SettingExerciseDisplay from "./SettingExerciseDisplay";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -27,7 +27,7 @@ function CustomTabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ py: 2 }}>{children}</Box>}
     </div>
   );
 }
@@ -41,7 +41,6 @@ function a11yProps(index: number) {
 
 export default function SettingTabs() {
   const [value, setValue] = React.useState(0);
-  const router = useRouter();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -52,17 +51,28 @@ export default function SettingTabs() {
     "&.Mui-selected": { bgcolor: "primary.main", color: "#ffffff" },
   } as const;
 
+  const exercises = useExerciseStore((s) => s.exercises);
+  const [bodyPart, setBodyPart] = useState<string>("");
+  const [equipment, setEquipment] = useState<string>("");
+
+  const filtered = exercises.filter(
+    (e) =>
+      (!bodyPart || bodyPart === e.bodyPart) &&
+      (!equipment || equipment === e.equipment)
+  );
+
   return (
-    <Container maxWidth="sm" sx={{ position: "relative" }}>
-      {/* 絕對定位讓箭頭不佔 flex 空間，Tabs 的置中才不會被擠歪；top 對齊 48px 高的 Tabs 列 */}
-      <IconButton
-        onClick={() => router.back()}
-        sx={{ position: "absolute", left: 8, top: 4 }}
-      >
-        <ArrowBackIcon />
-      </IconButton>
+    <Container maxWidth="sm" sx={{ bgcolor: "secondary.main" }}>
       <Box sx={{ width: "100%" }}>
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 4,
+          }}
+        >
           <Tabs
             value={value}
             onChange={handleChange}
@@ -71,12 +81,20 @@ export default function SettingTabs() {
             <Tab sx={tabSx} label="顯示／隱藏動作" {...a11yProps(0)} />
             <Tab sx={tabSx} label="設定組間秒數" {...a11yProps(1)} />
           </Tabs>
+          <Box sx={{ width:'100%' }}>
+            <ExerciseFilter
+              bodyPart={bodyPart}
+              setBodyPart={setBodyPart}
+              equipment={equipment}
+              setEquipment={setEquipment}
+            />
+          </Box>
         </Box>
         <CustomTabPanel value={value} index={0}>
-          <SelectExercise />
+          <SettingExerciseDisplay filtered={filtered} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
-          <SetTimeInterval />
+          <SettingDefaultRestTime filtered={filtered} />
         </CustomTabPanel>
       </Box>
     </Container>

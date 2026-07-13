@@ -74,6 +74,7 @@ export default function ExerciseSelection() {
         '> *': {
           flex: '0 0 auto',
         },
+        bgcolor:'secondary.main'
       }}
     >
       <Stack direction='row' spacing={1}>

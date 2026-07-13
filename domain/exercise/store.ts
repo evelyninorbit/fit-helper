@@ -1,11 +1,8 @@
 import type { Exercise } from './schema'
 import { EExerciseType, ELoadUnit } from './schema'
-import { useMemo } from 'react'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
-
-const ALL = '' as const
 
 export const EXERCISES: Exercise[] = [
   {
@@ -122,9 +119,6 @@ export const EXERCISES: Exercise[] = [
 
 export type ExerciseStore = {
   exercises: Exercise[]
-  bodyPart: string // 目前選的部位；'' = 全部
-  equipment: string // 目前選的器材；'' = 全部
-  restTime: number
 }
 
 export const defaultExercises: Exercise[] = []
@@ -132,9 +126,6 @@ export const defaultRestTime = 90
 
 export const initialExerciseState: ExerciseStore = {
   exercises: defaultExercises,
-  bodyPart: ALL,
-  equipment: ALL,
-  restTime: defaultRestTime,
 }
 
 export const useExerciseStore = create<ExerciseStore>()(
@@ -145,7 +136,6 @@ export const useExerciseStore = create<ExerciseStore>()(
       // 只保存動作清單；篩選選擇不存，重整後自動歸零為「全部」
       partialize: state => ({
         exercises: state.exercises,
-        restTime: state.restTime,
       }),
       onRehydrateStorage: () => (state, error) => {
         if (state && state.exercises.length === 0) {
@@ -176,38 +166,4 @@ export const updateRestTime = (
     const target = state.exercises.find(e => e.id === exerciseId)
     if (target) target.restTime = restTime
   })
-}
-
-// ── 篩選狀態（跨頁共享）────────────────────────────────
-export const useBodyPart = () => useExerciseStore(state => state.bodyPart)
-
-export const useEquipment = () => useExerciseStore(state => state.equipment)
-
-export const setBodyPart = (bodyPart: string) => {
-  useExerciseStore.setState(state => {
-    state.bodyPart = bodyPart
-    state.equipment = ALL // 換部位時把器材重設為「全部」，避免留下不相容的選擇
-  })
-}
-
-export const setEquipment = (equipment: string) => {
-  useExerciseStore.setState(state => {
-    state.equipment = equipment
-  })
-}
-
-// 依目前篩選條件算出的動作清單。用 useMemo 避免每次 render 都產生新陣列
-export const useFilteredExercises = () => {
-  const exercises = useExercises()
-  const bodyPart = useBodyPart()
-  const equipment = useEquipment()
-  return useMemo(
-    () =>
-      exercises.filter(
-        e =>
-          (bodyPart === ALL || e.bodyPart === bodyPart) &&
-          (equipment === ALL || e.equipment === equipment),
-      ),
-    [exercises, bodyPart, equipment],
-  )
 }

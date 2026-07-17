@@ -1,10 +1,14 @@
-'use client'
-import * as React from 'react';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
-import SelectExercise from './SelectExercise';
-import SetTimeInterval from './SetTimeInterval';
+"use client";
+import * as React from "react";
+import { useState } from "react";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
+import { Container } from "@mui/material";
+import SettingDefaultRestTime from "./SettingDefaultRestTime";
+import ExerciseFilter from "./ExerciseFilter";
+import { useExerciseStore } from "@/domain/exercise/store";
+import SettingExerciseDisplay from "./SettingExerciseDisplay";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -23,7 +27,7 @@ function CustomTabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ py: 2 }}>{children}</Box>}
     </div>
   );
 }
@@ -31,7 +35,7 @@ function CustomTabPanel(props: TabPanelProps) {
 function a11yProps(index: number) {
   return {
     id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
   };
 }
 
@@ -43,28 +47,56 @@ export default function SettingTabs() {
   };
 
   const tabSx = {
-     borderRadius:2,
-    '&.Mui-selected': { bgcolor: 'primary.main', color:'#ffffff' },
+    borderRadius: 2,
+    "&.Mui-selected": { bgcolor: "primary.main", color: "#ffffff" },
   } as const;
 
+  const exercises = useExerciseStore((s) => s.exercises);
+  const [bodyPart, setBodyPart] = useState<string>("");
+  const [equipment, setEquipment] = useState<string>("");
+
+  const filtered = exercises.filter(
+    (e) =>
+      (!bodyPart || bodyPart === e.bodyPart) &&
+      (!equipment || equipment === e.equipment)
+  );
+
   return (
-    <Box sx={{ width: '100%' }}>
-      <Box sx={{display:'flex',justifyContent:'center'}}>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          slotProps={{ indicator: { sx: { display: 'none' } } }}
+    <Container maxWidth="sm" sx={{ bgcolor: "secondary.main" }}>
+      <Box sx={{ width: "100%" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 4,
+          }}
         >
-          <Tab sx={tabSx}label="顯示／隱藏動作" {...a11yProps(0)} />
-          <Tab sx={tabSx}label="設定組間秒數" {...a11yProps(1)} />
-        </Tabs>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            slotProps={{ indicator: { sx: { display: "none" } } }}
+          >
+            <Tab sx={tabSx} label="顯示／隱藏動作" {...a11yProps(0)} />
+            <Tab sx={tabSx} label="設定組間秒數" {...a11yProps(1)} />
+          </Tabs>
+          <Box sx={{ width:'100%' }}>
+            <ExerciseFilter
+              bodyPart={bodyPart}
+              setBodyPart={setBodyPart}
+              equipment={equipment}
+              setEquipment={setEquipment}
+            />
+          </Box>
+        </Box>
+        <CustomTabPanel value={value} index={0}>
+          <SettingExerciseDisplay filtered={filtered} />
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={1}>
+          <SettingDefaultRestTime filtered={filtered} />
+        </CustomTabPanel>
       </Box>
-      <CustomTabPanel value={value} index={0}>
-        <SelectExercise />
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={1}>
-        <SetTimeInterval />
-      </CustomTabPanel>
-    </Box>
+    </Container>
   );
 }

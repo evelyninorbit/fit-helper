@@ -2,21 +2,22 @@ import { create } from 'zustand'
 import type { Workout } from './schema'
 import { persist } from 'zustand/middleware'
 
+
 export type WorkoutStore = Workout | null
 
 const defaultWorkout: Workout = {
   startedAt: '',
   finishedAt: '',
   note: '',
-  exercise: [],
+  exercise:[],
 }
 
 const useWorkoutStore = create<WorkoutStore>()(
   persist<WorkoutStore>(() => null, {
     name: 'workout',
-    onRehydrateStorage: () => (state, error) => {
-      if (state === null) return defaultWorkout
-      if (error) console.error('Failed to rehydrate categories store', error)
+    merge: persistedState => (persistedState as WorkoutStore) ?? defaultWorkout,
+    onRehydrateStorage: () => (_state, error) => {
+      if (error) console.error('Failed to rehydrate workout store', error)
     },
   }),
 )
@@ -30,17 +31,26 @@ const startWorkout = () => {
   })
 }
 
-// const finishWorkout = () => {
-//   useWorkoutStore.setState(prev => {
-//     if (!prev?.startedAt) return prev
-//     return {
-//       finishedAt: new Date().toISOString(),
-//     }
-//   })
-// }
+const finishWorkout = () => {
+  useWorkoutStore.setState(prev => {
+    if (!prev?.startedAt) return prev
+    return {
+      finishedAt: new Date().toISOString(),
+    }
+  })
+}
 
 const resetWorkout = () => {
   useWorkoutStore.setState(defaultWorkout)
+}
+
+const resumeWorkout = () => {
+  useWorkoutStore.setState(prev => {
+    if (!prev?.startedAt) return prev
+    return {
+      finishedAt: '',
+    }
+  })
 }
 
 const updateWorkoutNote = (note: string) => {
@@ -90,7 +100,9 @@ const removeExerciseFromWorkout = (exerciseId: string) => {
 
 export {
   startWorkout,
+  finishWorkout,
   resetWorkout,
+  resumeWorkout,
   updateWorkoutNote,
   addExerciseToWorkout,
   updateExerciseInWorkout,

@@ -27,7 +27,7 @@ function CustomTabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ py: 2 }}>{children}</Box>}
+      {value === index && <Box>{children}</Box>}
     </div>
   );
 }
@@ -62,8 +62,19 @@ export default function SettingTabs() {
   );
 
   return (
-    <Container maxWidth="sm" sx={{ bgcolor: "secondary.main" }}>
-      <Box sx={{ width: "100%" }}>
+    <Container
+      maxWidth="sm"
+      sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+    >
+      <Box
+        sx={{
+          width: "100%",
+          flex: 1,
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <Box
           sx={{
             display: "flex",
@@ -71,6 +82,7 @@ export default function SettingTabs() {
             justifyContent: "center",
             alignItems: "center",
             gap: 4,
+            marginTop: 2,
           }}
         >
           <Tabs
@@ -81,7 +93,7 @@ export default function SettingTabs() {
             <Tab sx={tabSx} label="顯示／隱藏動作" {...a11yProps(0)} />
             <Tab sx={tabSx} label="設定組間秒數" {...a11yProps(1)} />
           </Tabs>
-          <Box sx={{ width:'100%' }}>
+          <Box sx={{ width: "100%" }}>
             <ExerciseFilter
               bodyPart={bodyPart}
               setBodyPart={setBodyPart}
@@ -90,12 +102,21 @@ export default function SettingTabs() {
             />
           </Box>
         </Box>
-        <CustomTabPanel value={value} index={0}>
-          <SettingExerciseDisplay filtered={filtered} />
-        </CustomTabPanel>
-        <CustomTabPanel value={value} index={1}>
-          <SettingDefaultRestTime filtered={filtered} />
-        </CustomTabPanel>
+        <Box
+          sx={{
+            flex: 1,
+            minHeight: 0,
+            overflowY: "auto",
+            marginY: 2,
+          }}
+        >
+          <CustomTabPanel value={value} index={0}>
+            <SettingExerciseDisplay filtered={filtered} />
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={1}>
+            <SettingDefaultRestTime filtered={filtered} />
+          </CustomTabPanel>
+        </Box>
       </Box>
     </Container>
   );

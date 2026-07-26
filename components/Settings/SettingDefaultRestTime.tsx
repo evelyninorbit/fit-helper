@@ -19,7 +19,7 @@ export default function SettingDefaultRestTime({filtered}:SettingDefaultRestTime
   const outlinedWeightId = useId();
 
   return (
-    <List>
+    <List disablePadding>
       {filtered
         .filter((e) => e.display)
         .map((s) => (

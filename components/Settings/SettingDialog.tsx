@@ -1,12 +1,17 @@
-import { Dialog, DialogProps } from '@mui/material'
-import SettingTabs from './SettingTabs'
+import { Dialog, DialogProps } from "@mui/material";
+import SettingTabs from "./SettingTabs";
 
-const SettingDialog: React.FC<DialogProps> = props => {
+const SettingDialog: React.FC<DialogProps> = (props) => {
   return (
-    <Dialog {...props}>
+    <Dialog
+      {...props}
+      fullWidth
+      maxWidth="sm"
+      slotProps={{ paper: { sx: { height: "80vh", bgcolor: "secondary.main" } } }}
+    >
       <SettingTabs />
     </Dialog>
-  )
-}
+  );
+};
 
-export default SettingDialog
+export default SettingDialog;

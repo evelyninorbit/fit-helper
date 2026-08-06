@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-// 管理單一組的倒數計時，由每個 DurationSetItem 自己持有。
+// 管理一次倒數計時，由使用它的元件各自持有（計時組的每一組、組間休息各一份）。
 // 倒數只存在記憶體，重新整理或元件 unmount 即消失；歸零時呼叫 onFinish 收尾。
 export default function useCountdown(onFinish: () => void) {
   // 剩餘秒數；null = 沒在倒數（未開始或已結束）
@@ -35,16 +35,46 @@ export default function useCountdown(onFinish: () => void) {
     return () => clearInterval(id);
   }, [endAt]);
 
-  const start = (seconds: number) => {
+  // 用 useCallback 固定住，呼叫端才能安心放進 effect 依賴
+  const start = useCallback((seconds: number) => {
     setRemaining(seconds);
     setEndAt(Date.now() + seconds * 1000);
-  };
+  }, []);
 
   const pause = () => setEndAt(null);
+
+  // 提前中止倒數。刻意不呼叫 onFinish：
+  // 「時間到」與「使用者喊停」要記錄的東西不同，收尾交給呼叫端自己做
+  const stop = useCallback(() => {
+    setRemaining(null);
+    setEndAt(null);
+  }, []);
 
   const resume = () => {
     if (remaining !== null) setEndAt(Date.now() + remaining * 1000);
   };
 
-  return { remaining, running: endAt !== null, start, pause, resume };
+  const updateEndAt = useCallback((seconds: number) => {
+    setEndAt((prev) => {
+      const newEndAt =
+        prev === null ? Date.now() + seconds * 1000 : prev + seconds * 1000;
+      if (newEndAt <= Date.now()) {
+        setRemaining(null);
+        onFinishRef.current();
+        return null;
+      }
+      setRemaining(Math.ceil((newEndAt - Date.now()) / 1000));
+      return newEndAt;
+    });
+  }, []);
+
+  return {
+    remaining,
+    running: endAt !== null,
+    start,
+    pause,
+    resume,
+    stop,
+    updateEndAt,
+  };
 }

@@ -1,11 +1,16 @@
+"use client";
+
+import { useState } from "react";
 import type { SxProps, Theme } from "@mui/material";
 import { IconButton } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
 import CreateIcon from "@mui/icons-material/Create";
 import CheckIcon from "@mui/icons-material/Check";
-import { updateSetTiming } from "@/domain/workout/store";
+import useWorkoutStore, { updateSetTiming } from "@/domain/workout/store";
+import { useExerciseStore } from "@/domain/exercise/store";
 import type { SetBasicRecord } from "@/domain/set/schema";
+import RestBetweenSets from "../RestBetweenSets";
 
 type LoadSetActionButtonProps = {
   entryId: string;
@@ -16,6 +21,7 @@ type LoadSetActionButtonProps = {
   onToggleEditable: (setId: string) => void;
   // 與其他按鈕共用的樣式，由外部傳入
   sx?: SxProps<Theme>;
+  disabled?: boolean;
 };
 
 export default function LoadSetActionButton({
@@ -24,16 +30,33 @@ export default function LoadSetActionButton({
   editable,
   onToggleEditable,
   sx,
+  disabled,
 }: LoadSetActionButtonProps) {
+  // 按下停止後彈出的組間休息 dialog
+  const [restOpen, setRestOpen] = useState(false);
+
+  // 這一組屬於哪個動作，決定休息幾秒（Settings 可調）
+  const exerciseId = useWorkoutStore(
+    (s) => s?.exercise.find((e) => e.id === entryId)?.exerciseId
+  );
+  const restSeconds =
+    useExerciseStore((s) =>
+      exerciseId === undefined
+        ? undefined
+        : s.exercises.find((e) => e.id === exerciseId)?.restTime
+    ) ?? 0;
+
   const handleClick = () => {
     if (set.startedAt && set.finishedAt) {
       // 已結束：僅切換可編輯，不動 startedAt / finishedAt
       onToggleEditable(set.id);
     } else if (set.startedAt) {
-      // 進行中：記錄結束時間
+      // 進行中：記錄結束時間，並開始組間休息
       updateSetTiming(entryId, set.id, {
         finishedAt: new Date().toISOString(),
       });
+      // 沒設定休息時間就不彈（否則 dialog 會開了又立刻關）
+      if (restSeconds > 0) setRestOpen(true);
     } else {
       // 未開始：記錄開始時間
       updateSetTiming(entryId, set.id, {
@@ -44,18 +67,27 @@ export default function LoadSetActionButton({
   };
 
   return (
-    <IconButton sx={sx} onClick={handleClick}>
-      {set.startedAt && set.finishedAt ? (
-        editable ? (
-          <CheckIcon />
+    <>
+      <IconButton sx={sx} onClick={handleClick} disabled={disabled}>
+        {set.startedAt && set.finishedAt ? (
+          editable ? (
+            <CheckIcon />
+          ) : (
+            <CreateIcon />
+          )
+        ) : set.startedAt ? (
+          <StopIcon />
         ) : (
-          <CreateIcon />
-        )
-      ) : set.startedAt ? (
-        <StopIcon />
-      ) : (
-        <PlayArrowIcon />
-      )}
-    </IconButton>
+          <PlayArrowIcon />
+        )}
+      </IconButton>
+      <RestBetweenSets
+        open={restOpen}
+        seconds={restSeconds}
+        onClose={() => setRestOpen(false)}
+        note={set.note}
+        onNoteChange={(note) => updateSetTiming(entryId, set.id, { note })}
+      />
+    </>
   );
 }

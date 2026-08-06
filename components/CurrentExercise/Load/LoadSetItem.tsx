@@ -2,10 +2,7 @@
 
 import { Grid, Typography, TextField, IconButton } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import {
-  updateLoadSet,
-  removeLoadSet,
-} from "@/domain/workout/store";
+import { updateLoadSet, removeLoadSet } from "@/domain/workout/store";
 import type { SetRecordWithLoad } from "@/domain/set/schema";
 import LoadSetActionButton from "./LoadSetActionButton";
 
@@ -16,6 +13,7 @@ const iconButtonSx = {
   bgcolor: "primary.main",
   color: "#ffffff",
   "&:hover": { bgcolor: "primary.light" },
+  "&.Mui-disabled": { bgcolor: "action.disabledBackground" },
 };
 
 type LoadSetItemProps = {
@@ -37,6 +35,8 @@ export default function LoadSetItem({
 }: LoadSetItemProps) {
   // 已開始且未被解鎖的組鎖定輸入
   const locked = !!set.startedAt && !editable;
+  // 防呆：kg 或次數為空（值為 0 時顯示空白）就不能開始該組
+  const startDisabled = !set.startedAt && (set.load === 0 || set.reps === 0);
 
   return (
     <Grid container spacing={2} sx={{ alignItems: "center" }}>
@@ -54,9 +54,15 @@ export default function LoadSetItem({
           value={set.load === 0 ? "" : set.load}
           onChange={(e) =>
             updateLoadSet(entryId, set.id, {
-              load: Number(e.target.value),
+              load: Math.max(0, Number(e.target.value)),
             })
           }
+          slotProps={{
+            htmlInput: {
+              min: 0,
+              step: 5,
+            },
+          }}
         />
       </Grid>
       <Grid size={3}>
@@ -68,9 +74,14 @@ export default function LoadSetItem({
           value={set.reps === 0 ? "" : set.reps}
           onChange={(e) =>
             updateLoadSet(entryId, set.id, {
-              reps: Number(e.target.value),
+              reps: Math.max(0, Number(e.target.value)),
             })
           }
+          slotProps={{
+            htmlInput: {
+              min: 0,
+            },
+          }}
         />
       </Grid>
       <Grid size={2}>
@@ -80,6 +91,7 @@ export default function LoadSetItem({
           editable={editable}
           onToggleEditable={onToggleEditable}
           sx={iconButtonSx}
+          disabled={startDisabled}
         />
       </Grid>
       <Grid size={2}>
@@ -94,6 +106,8 @@ export default function LoadSetItem({
         <TextField
           label="該組筆記"
           variant="outlined"
+          multiline
+          maxRows={5}
           fullWidth
           value={set.note}
           onChange={(e) =>

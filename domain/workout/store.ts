@@ -119,7 +119,14 @@ const addLoadSet = (entryId: string) => {
     if (!state?.startedAt) return
     const entry = state.exercise.find(e => e.id === entryId)
     if (!entry || entry.exerciseType !== EExerciseType.WEIGHT) return
-    entry.sets.push({ ...defaultSet, id: crypto.randomUUID() })
+    // 最新一組的 kg 與次數都有填才沿用，讓使用者不必每組重打；任一欄空白就用預設值
+    const latestSet = entry.sets.at(-1)
+    const carryOver = !!latestSet && latestSet.load > 0 && latestSet.reps > 0
+    entry.sets.push({
+      ...defaultSet,
+      ...(carryOver ? { load: latestSet.load, reps: latestSet.reps } : {}),
+      id: crypto.randomUUID(),
+    })
   })
 }
 
@@ -151,7 +158,14 @@ const addDurationSet = (entryId: string) => {
     if (!state?.startedAt) return
     const entry = state.exercise.find(e => e.id === entryId)
     if (!entry || entry.exerciseType !== EExerciseType.TIME) return
-    entry.sets.push({ ...defaultDurationSet, id: crypto.randomUUID() })
+    // 同 addLoadSet：最新一組有設定倒數時間就沿用
+    const latestSet = entry.sets.at(-1)
+    const carryOver = !!latestSet && latestSet.duration > 0
+    entry.sets.push({
+      ...defaultDurationSet,
+      ...(carryOver ? { duration: latestSet.duration } : {}),
+      id: crypto.randomUUID(),
+    })
   })
 }
 

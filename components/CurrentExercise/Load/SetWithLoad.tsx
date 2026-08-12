@@ -5,6 +5,7 @@ import { List, Button, Stack } from "@mui/material";
 import useWorkoutStore, { addLoadSet } from "@/domain/workout/store";
 import type { SetRecordWithLoad } from "@/domain/set/schema";
 import LoadSetItem from "./LoadSetItem";
+import useActiveSetScroll from "../useActiveSetScroll";
 
 type SetWithLoadProps = {
   // entryId = ExerciseRecord.id，每次訓練的一筆動作實例（同動作做兩次也不會撞）
@@ -15,6 +16,12 @@ export default function SetWithLoad({ entryId }: SetWithLoadProps) {
   const sets = (useWorkoutStore(
     (s) => s?.exercise.find((e) => e.id === entryId)?.sets
   ) ?? []) as SetRecordWithLoad[];
+
+  // 只有第一組還沒完成的可以操作，避免第二組還沒紀錄就先做第三組
+  const activeIndex = sets.findIndex((s) => !s.startedAt || !s.finishedAt);
+
+  // 組數多到要捲動時，讓進行中的那組自動維持在列表中央
+  const listRef = useActiveSetScroll(activeIndex, sets.length);
 
   // 已結束後被使用者手動解鎖、可再編輯數字的組（不影響 startedAt / finishedAt）
   const [editableSetIds, setEditableSetIds] = useState<Set<string>>(new Set());
@@ -44,6 +51,7 @@ export default function SetWithLoad({ entryId }: SetWithLoadProps) {
   return (
     <Stack sx={{ width: "100%", flex: 1, minHeight: 0 }}>
       <List
+        ref={listRef}
         sx={{
           flex: 1,
           minHeight: 0,
@@ -59,6 +67,7 @@ export default function SetWithLoad({ entryId }: SetWithLoadProps) {
             entryId={entryId}
             set={set}
             index={index}
+            isActive={index === activeIndex}
             editable={editableSetIds.has(set.id)}
             onToggleEditable={toggleEditable}
           />

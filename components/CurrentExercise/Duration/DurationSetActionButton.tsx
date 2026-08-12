@@ -31,10 +31,16 @@ export default function DurationSetActionButton({
   sx,
   startDisabled,
 }: DurationSetActionButtonProps) {
-  // 每個狀態只留一顆按鈕可按，其餘一律 disabled（而非隱藏），避免誤觸也避免版面跳動
+  // 每個狀態只留一顆按鈕可按，其餘轉為唯讀（不隱藏也不變灰），避免誤觸也避免版面跳動
   const canStart = !finished && !countdown?.running && !startDisabled;
   const canPause = !!countdown?.running;
   const canStop = !finished && !!countdown;
+
+  // 唯讀的按鈕外觀不變，只是點擊不觸發任何動作
+  const readOnlyGuard = (allowed: boolean, action: () => void) => () => {
+    if (!allowed) return;
+    action();
+  };
 
   // 外部樣式擺後面，讓呼叫端仍能覆蓋寬度
   const buttonSx: SxProps<Theme> = [
@@ -48,19 +54,31 @@ export default function DurationSetActionButton({
         <IconButton
           sx={buttonSx}
           // 未開始 → 開始；暫停中 → 繼續
-          onClick={countdown ? onResume : onStart}
-          disabled={!canStart}
+          onClick={readOnlyGuard(canStart, countdown ? onResume : onStart)}
+          aria-disabled={!canStart}
+          // 唯讀時不要有水波紋，免得看起來像真的按到了
+          disableRipple={!canStart}
         >
           <PlayArrowIcon />
         </IconButton>
       </Grid>
       <Grid size={4}>
-        <IconButton sx={buttonSx} onClick={onPause} disabled={!canPause}>
+        <IconButton
+          sx={buttonSx}
+          onClick={readOnlyGuard(canPause, onPause)}
+          aria-disabled={!canPause}
+          disableRipple={!canPause}
+        >
           <PauseIcon />
         </IconButton>
       </Grid>
       <Grid size={4}>
-        <IconButton sx={buttonSx} onClick={onStop} disabled={!canStop}>
+        <IconButton
+          sx={buttonSx}
+          onClick={readOnlyGuard(canStop, onStop)}
+          aria-disabled={!canStop}
+          disableRipple={!canStop}
+        >
           <StopIcon />
         </IconButton>
       </Grid>

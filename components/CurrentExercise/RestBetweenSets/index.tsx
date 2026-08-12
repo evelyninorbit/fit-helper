@@ -8,14 +8,12 @@ import RestCountDown from "./RestCountdown";
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   // 固定高度：筆記輸入變多行時 dialog 也不會跟著長高
   "& .MuiDialog-paper": {
-    height: 440,
-    maxHeight: "90vh",
+    borderRadius: 10,
+    width: "80%",
+    height: "80%",
+    maxHeight: "100vh",
   },
-  "& .MuiDialogContent-root": {
-    padding: theme.spacing(2),
-    // 內容超出固定高度時在這層捲動，不推擠外框
-    overflowY: "auto",
-  },
+
   "& .MuiDialogActions-root": {
     padding: theme.spacing(1),
   },

@@ -8,6 +8,7 @@ import useWorkoutStore, {
 } from "@/domain/workout/store";
 import type { SetRecordWithDuration } from "@/domain/set/schema";
 import DurationSetItem from "./DurationSetItem";
+import useActiveSetScroll from "../useActiveSetScroll";
 
 type SetWithDurationProps = {
   // entryId = ExerciseRecord.id，每次訓練的一筆動作實例（同動作做兩次也不會撞）
@@ -18,6 +19,12 @@ export default function SetWithDuration({ entryId }: SetWithDurationProps) {
   const sets = (useWorkoutStore(
     (s) => s?.exercise.find((e) => e.id === entryId)?.sets
   ) ?? []) as SetRecordWithDuration[];
+
+  // 只有第一組還沒完成的可以操作，避免第二組還沒紀錄就先做第三組
+  const activeIndex = sets.findIndex((s) => !s.startedAt || !s.finishedAt);
+
+  // 組數多到要捲動時，讓進行中的那組自動維持在列表中央
+  const listRef = useActiveSetScroll(activeIndex, sets.length);
 
   // 進入頁面時，等 persist 還原完成後若這個動作沒有任何組，預設補上第一組
   useEffect(() => {
@@ -38,6 +45,7 @@ export default function SetWithDuration({ entryId }: SetWithDurationProps) {
   return (
     <Stack sx={{ width: "100%", flex: 1, minHeight: 0 }}>
       <List
+        ref={listRef}
         sx={{
           flex: 1,
           minHeight: 0,
@@ -53,6 +61,7 @@ export default function SetWithDuration({ entryId }: SetWithDurationProps) {
             entryId={entryId}
             set={set}
             index={index}
+            isActive={index === activeIndex}
             onRemove={() => removeDurationSet(entryId, set.id)}
           />
         ))}

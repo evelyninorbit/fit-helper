@@ -21,6 +21,7 @@ type LoadSetActionButtonProps = {
   onToggleEditable: (setId: string) => void;
   // 與其他按鈕共用的樣式，由外部傳入
   sx?: SxProps<Theme>;
+  // 唯讀：按鈕仍維持原本外觀與焦點，只是點擊不觸發任何動作
   disabled?: boolean;
 };
 
@@ -47,6 +48,8 @@ export default function LoadSetActionButton({
     ) ?? 0;
 
   const handleClick = () => {
+    // 唯讀狀態：外觀不變（不走 disabled），但點下去不做事
+    if (disabled) return;
     if (set.startedAt && set.finishedAt) {
       // 已結束：僅切換可編輯，不動 startedAt / finishedAt
       onToggleEditable(set.id);
@@ -68,7 +71,13 @@ export default function LoadSetActionButton({
 
   return (
     <>
-      <IconButton sx={sx} onClick={handleClick} disabled={disabled}>
+      <IconButton
+        sx={sx}
+        onClick={handleClick}
+        aria-disabled={disabled}
+        // 唯讀時不要有水波紋，免得看起來像真的按到了
+        disableRipple={disabled}
+      >
         {set.startedAt && set.finishedAt ? (
           editable ? (
             <CheckIcon />

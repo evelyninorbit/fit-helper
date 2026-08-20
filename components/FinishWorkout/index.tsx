@@ -1,44 +1,15 @@
 "use client";
-import { useExerciseStore } from "@/domain/exercise/store";
-import dayjs from "dayjs";
-import { formatDuration } from "@/domain/workout/utils";
-import { addRecord } from "@/domain/record/store";
-import {
-  Container,
-  Button,
-  Stack,
-  List,
-  ListItem,
-  ListItemText,
-  TextField,
-  Typography,
-} from "@mui/material";
-import useWorkoutStore, {
-  updateWorkoutNote,
-  resetWorkout,
-  resumeWorkout,
-} from "@/domain/workout/store";
-import { getExerciseName } from "@/domain/exercise/utils";
+import { Container, Stack, TextField } from "@mui/material";
+import useWorkoutStore, { updateWorkoutNote } from "@/domain/workout/store";
+import FinishTimeMark from "./FinishTimeMark";
+import FinishNavigationButton from "./FinishNavigationButton";
+import FinishWorkoutList from "./FinishWorkoutList";
 
 export default function FinishWorkout() {
-  const startedAt = useWorkoutStore((state) => state?.startedAt);
-  const finishedAt = useWorkoutStore((state) => state?.finishedAt);
-  const workoutDuration =
-    startedAt && finishedAt ? formatDuration(startedAt, finishedAt) : "";
-
-  const workoutDate = startedAt
-    ? dayjs(startedAt).locale("zh-tw").format("YYYY年M月D日 ddd")
-    : "";
-  const workoutExercises = useWorkoutStore((s) => s?.exercise);
-  const exercises = useExerciseStore((s) => s.exercises);
-
-  const handleSaveRecord = () => {
-    const workout = useWorkoutStore.getState();
-    if (!workout?.finishedAt) return;
-    addRecord({ ...workout, id: crypto.randomUUID() });
-    resetWorkout();
-  };
   const note = useWorkoutStore((s) => s?.note ?? "");
+  const startedAt = useWorkoutStore((s) => s?.startedAt ?? "");
+  const finishedAt = useWorkoutStore((s) => s?.finishedAt ?? "");
+  const exercises = useWorkoutStore((s) => s?.exercise);
   return (
     <Container
       maxWidth="sm"
@@ -50,12 +21,7 @@ export default function FinishWorkout() {
         justifyContent: "center",
       }}
     >
-      <Typography sx={{ textAlign: "center", mt: 5 }}>{workoutDate}</Typography>
-      {workoutDuration && (
-        <Typography sx={{ textAlign: "center", mt: 2 }}>
-          總時長：{workoutDuration}
-        </Typography>
-      )}
+      <FinishTimeMark startedAt={startedAt} finishedAt={finishedAt} />
       <Stack
         sx={{
           width: "100%",
@@ -65,27 +31,7 @@ export default function FinishWorkout() {
           overflowY: "auto",
         }}
       >
-        <List sx={{}}>
-          {workoutExercises?.map((record) => (
-            <ListItem
-              key={record.id}
-              sx={{
-                py: 1,
-                px: 2,
-                bgcolor: "primary.main",
-                color: "primary.contrastText",
-                borderRadius: 2,
-                "&:not(:last-child)": {
-                  mb: 1,
-                },
-              }}
-            >
-              <ListItemText
-                primary={getExerciseName(record.exerciseId, exercises)}
-              />
-            </ListItem>
-          ))}
-        </List>
+        <FinishWorkoutList exercises={exercises ?? []} />
         <TextField
           id="outlined-multiline-static"
           label="本日心得"
@@ -96,32 +42,7 @@ export default function FinishWorkout() {
           onChange={(e) => updateWorkoutNote(e.target.value)}
         />
       </Stack>
-      <Stack
-        sx={{
-          width: "100%",
-
-          flexDirection: "row",
-          justifyContent: "space-between",
-          gap: 2,
-        }}
-      >
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ mt: 3, height: 48, flex: 1, borderRadius: 2 }}
-          onClick={() => resumeWorkout()}
-        >
-          返回
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ mt: 3, height: 48, flex: 1, borderRadius: 2 }}
-          onClick={handleSaveRecord}
-        >
-          儲存
-        </Button>
-      </Stack>
+      <FinishNavigationButton />
     </Container>
   );
 }

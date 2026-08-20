@@ -143,8 +143,8 @@ export default function DurationSetItem({
               fullWidth
               type="text"
               inputMode="numeric"
-              // 倒數進行中（含暫停）、已結束、還輪不到的組都鎖定輸入
-              disabled={counting || finished || !isActive}
+              // 倒數進行中（含暫停）、已結束才鎖定輸入；還沒做的組可以先設定時間
+              disabled={counting || finished}
               // 倒數中顯示剩餘時間，其他時候顯示設定值
               value={formatDuration(remaining ?? set.duration)}
               onChange={(e) => handleDurationChange(e.target.value)}

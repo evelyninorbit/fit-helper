@@ -52,8 +52,8 @@ export default function LoadSetItem({
   const [noteOpen, setNoteOpen] = useState(false);
   // 這一組已經做完
   const finished = !!set.startedAt && !!set.finishedAt;
-  // 已開始、或還輪不到的組都鎖定輸入；手動解鎖後才放行
-  const locked = !editable && (!!set.startedAt || !isActive);
+  // 已開始的組才鎖定輸入（還沒做的組可以先填 kg／次數）；手動解鎖後才放行
+  const locked = !editable && !!set.startedAt;
   // 防呆：kg 或次數為空（值為 0 時顯示空白）就不能開始該組
   const startDisabled = !set.startedAt && (set.load === 0 || set.reps === 0);
   // 已完成的組保留編輯鍵；未完成但還輪不到的組不能開始

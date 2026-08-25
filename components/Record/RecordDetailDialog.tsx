@@ -8,6 +8,8 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import type { Record } from "@/domain/record/schema";
+import { getRecordBodyParts } from "@/domain/record/utils";
+import { useExerciseStore } from "@/domain/exercise/store";
 import FinishTimeMark from "../FinishWorkout/FinishTimeMark";
 import FinishWorkoutList from "../FinishWorkout/FinishWorkoutList";
 
@@ -23,6 +25,7 @@ export default function RecordDetailDialog({
   record,
   onClose,
 }: RecordDetailDialogProps) {
+  const exercises = useExerciseStore((s) => s.exercises);
   return (
     <Dialog
       fullScreen
@@ -32,7 +35,7 @@ export default function RecordDetailDialog({
     >
       {record && (
         <Container
-          maxWidth="sm"
+          maxWidth={false}
           sx={{
             height: "100%",
             display: "flex",
@@ -51,6 +54,7 @@ export default function RecordDetailDialog({
           <FinishTimeMark
             startedAt={record.startedAt}
             finishedAt={record.finishedAt}
+            bodyParts={getRecordBodyParts(record, exercises)}
           />
           <Stack
             sx={{

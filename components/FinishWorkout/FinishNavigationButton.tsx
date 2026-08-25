@@ -60,7 +60,9 @@ export default function FinishNavigationButton() {
           width: "100%",
           flexDirection: "row",
           justifyContent: "space-between",
-          gap: 2,
+          gap: 10,
+          marginBottom: 3,
+          paddingX: 3,
         }}
       >
         <Button

@@ -1,6 +1,7 @@
 "use client";
 
 import { Delete as DeleteIcon } from "@mui/icons-material";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import {
@@ -25,6 +26,8 @@ export default function ExerciseBottomNavigation() {
     (record) => record.id === eid
   );
   const currentRecord = workoutExercises[currentIndex];
+  const prevRecord =
+    currentIndex > 0 ? workoutExercises[currentIndex - 1] : undefined;
   const nextRecord = workoutExercises[currentIndex + 1];
 
   // 待刪除的動作 id：按下刪除鍵時先記下，等本頁卸載後才真的從 store 移除。
@@ -53,6 +56,16 @@ export default function ExerciseBottomNavigation() {
     router.push("/");
   };
 
+  // 回到前一個動作的 current-exercise 頁面（透過 eid 改變）；
+  // 沒有前一個動作時回到動作列表
+  const handlePrev = () => {
+    if (prevRecord) {
+      router.push(`/current-exercise?eid=${prevRecord.id}`);
+    } else {
+      router.push("/");
+    }
+  };
+
   // 前往下一個動作的 current-exercise 頁面（透過 eid 改變）；
   // 沒有下一個動作時回到動作列表
   const handleNext = () => {
@@ -76,6 +89,16 @@ export default function ExerciseBottomNavigation() {
         bottom: 0,
       }}
     >
+      <BottomNavigationAction
+        disableRipple
+        onClick={handlePrev}
+        icon={
+          <IconButton component="span" color="inherit">
+            <ArrowBackIosNewIcon />
+          </IconButton>
+        }
+        sx={{ cursor: "pointer" }}
+      />
       <BottomNavigationAction
         disableRipple
         onClick={handleBackToList}

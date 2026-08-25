@@ -13,6 +13,22 @@ import { EExerciseType, ELoadUnit } from "@/domain/exercise/schema";
 import type { ExerciseRecord } from "@/domain/record/schema";
 import { formatDuration } from "@/domain/set/utils";
 
+// 重量型與計時型的組數列長得一樣：左邊序號徽章、右邊內容，兩端對齊
+const SET_ROW_SX = {
+  px: 8,
+  py: 2,
+  display: "flex",
+  justifyContent: "space-between",
+  width: "100%",
+};
+
+const SET_INDEX_SX = {
+  bgcolor: "primary.main",
+  borderRadius: 2,
+  px: 1,
+  color: "primary.contrastText",
+};
+
 type FinishExerciseItemProps = {
   record: ExerciseRecord;
   name: string;
@@ -77,34 +93,15 @@ export default function FinishExerciseItem({
           )}
           {record.exerciseType === EExerciseType.WEIGHT
             ? record.sets.map((set, index) => (
-                <ListItemButton
-                  key={set.id}
-                  sx={{
-                    px: 8,
-                    py: 2,
-                    display: "flex",
-                    justifyContent: "space-between",
-                    width: "100%",
-                  }}
-                  disableRipple
-                >
-                  <Typography
-                    sx={{
-                      bgcolor: "primary.main",
-                      borderRadius: 2,
-                      px: 1,
-                      color: "primary.contrastText",
-                    }}
-                  >{`${index + 1}`}</Typography>
+                <ListItemButton key={set.id} sx={SET_ROW_SX} disableRipple>
+                  <Typography sx={SET_INDEX_SX}>{`${index + 1}`}</Typography>
                   <Typography>{`${set.load} ${loadUnit} × ${set.reps} 次`}</Typography>
                 </ListItemButton>
               ))
             : record.sets.map((set, index) => (
-                <ListItemButton key={set.id} sx={{ pl: 4 }} disableRipple>
-                  <ListItemText
-                    primary={`第 ${index + 1} 組`}
-                    secondary={formatDuration(set.duration)}
-                  />
+                <ListItemButton key={set.id} sx={SET_ROW_SX} disableRipple>
+                  <Typography sx={SET_INDEX_SX}>{`${index + 1}`}</Typography>
+                  <Typography>{formatDuration(set.duration)}</Typography>
                 </ListItemButton>
               ))}
         </List>

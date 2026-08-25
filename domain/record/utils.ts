@@ -52,3 +52,36 @@ export const getRecordBodyParts = (
     .filter((bodyPart): bodyPart is string => !!bodyPart);
   return [...new Set(bodyParts)];
 };
+
+// 篩選器的預設年份：一進來就停在今年，月份才能直接選
+export const getCurrentYear = () => dayjs().year();
+
+// 篩選器的年份選項：資料裡出現過的年份，新的在前
+// 一定包含今年——今年還沒有紀錄時，預設值才不會落在選單之外
+export const getRecordYears = (records: Record[]) =>
+  [
+    ...new Set([
+      getCurrentYear(),
+      ...records.map((r) => dayjs(r.startedAt).year()),
+    ]),
+  ].sort((a, b) => b - a);
+
+// 篩選器的預設月份：一進來就停在本月
+export const getCurrentMonth = () => dayjs().month() + 1;
+
+// 篩選器的月份選項：固定 1-12，不隨資料增減
+// 選到沒有紀錄的月份時，畫面自己會顯示「這段期間沒有訓練紀錄」
+export const MONTH_OPTIONS = Array.from({ length: 12 }, (_, i) => i + 1);
+
+// 年份沒選就全部列出；只選年份則整年列出；月份只在有選年份時才生效
+export const filterRecordsByYearMonth = (
+  records: Record[],
+  year: number | "",
+  month: number | "",
+) => {
+  if (year === "") return records;
+  return records.filter((r) => {
+    const date = dayjs(r.startedAt);
+    return date.year() === year && (month === "" || date.month() + 1 === month);
+  });
+};

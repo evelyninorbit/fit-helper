@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { List, ListItem, Button, ListItemText, Container } from "@mui/material";
+import { List, ListItem, Button, ListItemText } from "@mui/material";
 import { useExerciseStore } from "@/domain/exercise/store";
 import { Exercise } from "@/domain/exercise/schema";
 

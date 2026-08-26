@@ -48,9 +48,9 @@ export default function RecordsByLCalendar() {
   const selectedRecords = useMemo(
     () =>
       sortRecordsByLatest(records).filter((record) =>
-        dayjs(record.startedAt).isSame(selectedDate, "day"),
+        dayjs(record.startedAt).isSame(selectedDate, "day")
       ),
-    [records, selectedDate],
+    [records, selectedDate]
   );
 
   const handleMonthChange = (date: dayjs.Dayjs) => {
@@ -63,7 +63,7 @@ export default function RecordsByLCalendar() {
     (props: PickerDayProps) => (
       <ServerDay {...props} highlightedDays={highlightedDays} />
     ),
-    [highlightedDays],
+    [highlightedDays]
   );
 
   return (
@@ -71,6 +71,7 @@ export default function RecordsByLCalendar() {
       <DateCalendar
         // 日曆高度固定，不讓它被下方的詳細區塊擠扁
         sx={{ flexShrink: 0 }}
+        disableFuture
         value={selectedDate}
         onChange={(date) => date && setSelectedDate(date)}
         onMonthChange={handleMonthChange}

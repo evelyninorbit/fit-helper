@@ -11,7 +11,6 @@ import WorkoutBottomNavigation from "@/components/WorkoutBottomNavigation";
 import { AddExercise, ExerciseList } from "@/components/SelectingExercise";
 import "dayjs/locale/zh-tw";
 import FinishWorkout from "@/components/FinishWorkout";
-import FabStartWorkout from "@/components/SelectingExercise/FAB-StartWorkout";
 
 const RootWithWorkout: React.FC = () => (
   <>
@@ -31,7 +30,6 @@ const RootWithWorkout: React.FC = () => (
       <ExerciseList />
       <AddExercise />
     </Container>
-    <FabStartWorkout />
     <WorkoutBottomNavigation />
   </>
 );
